@@ -1,19 +1,30 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from myproject.firebase_app import db
+from myproject.firebase_app import db  # Firestore db import
 import datetime
 
-
 # =====================
-# Home Page (Splash + Data)
+# Home Page
 # =====================
 def home(request):
-    # Firestore se users fetch
-    users = db.collection("users").stream()
-    users_list = [{**u.to_dict(), "id": u.id} for u in users]
+    try:
+        users = db.collection("users").stream()
+        users_list = [{**u.to_dict(), "id": u.id} for u in users]
+    except Exception as e:
+        messages.error(request, f"Failed to fetch users: {e}")
+        users_list = []
 
-    # accounts/home.html render karo
     return render(request, "accounts/home.html", {"users": users_list})
+
+
+def test_firebase(request):
+    doc_ref = db.collection("test_users").document("demo_user")
+    doc_ref.set({
+        "name": "Sohaib",
+        "email": "sohaib@example.com"
+    })
+    return HttpResponse("✅ Firebase connected with keys1.json!")
 
 
 # =====================
@@ -28,13 +39,16 @@ def signup(request):
         gender = request.POST.get("gender")
         address = request.POST.get("address")
 
+        if not (name and email and password):
+            messages.error(request, "Name, Email and Password are required!")
+            return redirect("signup")
+
         try:
-            # Firestore me save karo
             user_ref = db.collection('users').document()
             user_ref.set({
                 'name': name,
                 'email': email,
-                'password': password,  # ❗ demo purpose, real project me encrypt karna hoga
+                'password': password,  # ⚠️ Demo, encrypt in real project
                 'phone': phone,
                 'gender': gender,
                 'address': address,
@@ -51,6 +65,9 @@ def signup(request):
     return render(request, "accounts/signup.html")
 
 
+# =====================
+# Signup Success Page
+# =====================
 def signup_success(request):
     return render(request, "accounts/signup_success.html")
 
@@ -92,3 +109,7 @@ def delete_user(request, user_id):
     user_ref.delete()
     messages.success(request, "User deleted successfully ❌")
     return redirect("home")
+
+
+def login_view(request):
+    return render(request, "accounts/login.html")

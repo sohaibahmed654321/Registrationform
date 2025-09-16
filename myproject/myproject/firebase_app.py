@@ -1,18 +1,17 @@
 import os
 import firebase_admin
 from firebase_admin import credentials, firestore
-from pathlib import Path
 
+# Project root ka path
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Service account key file ka name (tumhari nayi file)
+cred_path = os.path.join(BASE_DIR, "keys1.json")
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Service account key1.json ka path
-cred = credentials.Certificate(os.path.join(BASE_DIR, "myproject", "key1.json"))
-
-# Agar app pehle initialize nahi hua to hi initialize karo
+# Firebase initialize
 if not firebase_admin._apps:
+    cred = credentials.Certificate(cred_path)
     firebase_admin.initialize_app(cred)
 
-# ✅ Firestore client create karo
+# Firestore client
 db = firestore.client()
