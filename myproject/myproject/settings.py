@@ -3,7 +3,9 @@ Django settings for myproject project.
 """
 
 import os
+import sys
 from pathlib import Path
+
 
 # Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -84,16 +86,21 @@ USE_I18N = True
 USE_TZ = True
 
 
-# ✅ Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
 
 # Development me extra static files folders
 STATICFILES_DIRS = [
-    BASE_DIR / "accounts" / "static",  # app ke static files
+    BASE_DIR / "accounts"/"static",  # app ke static files
 ]
+# ✅ Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
 
 # Deployment ke liye collectstatic output
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASE_DIR)
